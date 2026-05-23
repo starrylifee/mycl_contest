@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── 교사 인증 판단 ──────────────────────────────────
+    // TEACHER_EMAILS 환경변수 대신 Firestore 자체 Custom Claims 또는
+    // 별도 teachers 컬렉션으로 관리. 여기서는 teachers 컬렉션 방식 사용.
+    function isTeacher() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
+    }
+
+    // ── teachers 컬렉션 ─────────────────────────────────
+    // 최초 교사 등록은 Firebase Console에서 수동으로 추가
+    match /teachers/{uid} {
+      allow read: if request.auth.uid == uid;
+      allow write: if false; // Console에서만 관리
+    }
+
+    // ── assignments ─────────────────────────────────────
+    // 교사만 생성/수정/삭제
+    // 학생은 shareToken으로 읽기 (by-token API가 서버사이드에서 처리)
+    match /assignments/{assignmentId} {
+      allow read: if isTeacher();
+      allow create: if isTeacher() &&
+                       request.resource.data.teacherUid == request.auth.uid;
+      allow update, delete: if isTeacher() &&
+                               resource.data.teacherUid == request.auth.uid;
+    }
+
+    // ── submissions ──────────────────────────────────────
+    // 학생: 누구나 제출(create), 자기 앱 읽기(generated 상태면 공개)
+    // 교사: assignmentId 기준으로 전체 읽기/수정
+    match /submissions/{submissionId} {
+      // 생성은 누구나 (학생 제출)
+      allow create: if true;
+
+      // 읽기: 교사이거나, 앱이 완성된 경우 공개
+      allow read: if isTeacher() ||
+                     resource.data.status == 'generated';
+
+      // 수정: 교사만 (AI 생성, 코드 편집)
+      allow update: if isTeacher();
+
+      // 삭제: 교사만
+      allow delete: if isTeacher();
+    }
+
+    // ── reviews ─────────────────────────────────────────
+    // 학생: 누구나 작성(create), 누구나 읽기(공개 갤러리)
+    // 교사: 전체 읽기 (루브릭 요약용)
+    match /reviews/{reviewId} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if isTeacher();
+    }
+  }
+}

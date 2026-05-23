@@ -9,11 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "firebase": "^12.13.0",
+    "firebase-admin": "^13.10.0",
+    "nanoid": "^5.1.11",
     "next": "16.2.6",
+    "openai": "^6.39.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
