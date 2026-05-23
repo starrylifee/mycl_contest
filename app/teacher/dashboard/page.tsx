@@ -13,6 +13,13 @@ export default function TeacherDashboard() {
   const [fetching, setFetching] = useState(false)
   const [tab, setTab] = useState<Tab>('assignments')
   const [copied, setCopied] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+
+  const copy = (text: string, msg = '복사했습니다!') => {
+    navigator.clipboard.writeText(text)
+    setToast(msg)
+    setTimeout(() => setToast(null), 2000)
+  }
 
   useEffect(() => {
     if (!loading && user) {
@@ -44,7 +51,7 @@ export default function TeacherDashboard() {
     const text = assignments
       .map((a) => `📌 ${a.title}\n학생 제출: ${base}/plan/${a.shareToken}\n갤러리: ${base}/gallery/${a.id}`)
       .join('\n\n')
-    navigator.clipboard.writeText(text)
+    copy(text, '전체 링크를 복사했습니다!')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -182,13 +189,13 @@ export default function TeacherDashboard() {
                       제출물 보기
                     </Link>
                     <button
-                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/plan/${a.shareToken}`)}
+                      onClick={() => copy(`${window.location.origin}/plan/${a.shareToken}`, '학생 링크를 복사했습니다!')}
                       className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-100"
                     >
                       학생 링크 복사
                     </button>
                     <button
-                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/gallery/${a.id}`)}
+                      onClick={() => copy(`${window.location.origin}/gallery/${a.id}`, '갤러리 링크를 복사했습니다!')}
                       className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100"
                     >
                       갤러리 링크 복사
@@ -234,7 +241,7 @@ export default function TeacherDashboard() {
                         {typeof window !== 'undefined' ? window.location.origin : ''}/plan/{a.shareToken}
                       </code>
                       <button
-                        onClick={() => navigator.clipboard.writeText(`${window.location.origin}/plan/${a.shareToken}`)}
+                        onClick={() => copy(`${window.location.origin}/plan/${a.shareToken}`, '학생 링크를 복사했습니다!')}
                         className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0"
                       >
                         복사
@@ -246,7 +253,7 @@ export default function TeacherDashboard() {
                         {typeof window !== 'undefined' ? window.location.origin : ''}/gallery/{a.id}
                       </code>
                       <button
-                        onClick={() => navigator.clipboard.writeText(`${window.location.origin}/gallery/${a.id}`)}
+                        onClick={() => copy(`${window.location.origin}/gallery/${a.id}`, '갤러리 링크를 복사했습니다!')}
                         className="text-xs text-gray-400 hover:text-gray-600 flex-shrink-0"
                       >
                         복사
@@ -259,6 +266,13 @@ export default function TeacherDashboard() {
           )
         )}
       </main>
+
+      {/* 토스트 */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm font-medium px-5 py-3 rounded-2xl shadow-lg animate-fade-in z-50">
+          ✅ {toast}
+        </div>
+      )}
     </div>
   )
 }
