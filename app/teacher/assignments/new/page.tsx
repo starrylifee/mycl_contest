@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { FIELD_LABELS, type FieldKey, type RubricItem } from '@/lib/types'
-import { getGradeGroups, getSubjects } from '@/lib/achievement-standards'
+import { getGradeGroups, getSubjects, getStandards } from '@/lib/achievement-standards'
 import Link from 'next/link'
 
 const ALL_FIELDS: FieldKey[] = [
@@ -32,10 +32,12 @@ export default function NewAssignment() {
     { label: '재미있어요', maxScore: 5 },
     { label: '사용하기 쉬워요', maxScore: 5 },
   ])
+  const [selectedStandards, setSelectedStandards] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
 
   const gradeGroups = getGradeGroups()
   const subjects = getSubjects(gradeLevel)
+  const availableStandards = subjectFilter ? getStandards(gradeLevel, subjectFilter) : []
 
   const toggleField = (f: FieldKey) => {
     setSelectedFields((prev) =>
@@ -46,6 +48,14 @@ export default function NewAssignment() {
   const applyRecommendation = (grade: string) => {
     setGradeLevel(grade)
     setSelectedFields(GRADE_RECOMMENDATIONS[grade] ?? GRADE_RECOMMENDATIONS['3~4학년'])
+    setSubjectFilter('')
+    setSelectedStandards([])
+  }
+
+  const toggleStandard = (s: string) => {
+    setSelectedStandards((prev) =>
+      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
+    )
   }
 
   const addRubricItem = () => {
@@ -69,7 +79,10 @@ export default function NewAssignment() {
     const res = await fetch('/api/assignments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ title, description, gradeLevel, subjectFilter, fieldsConfig: selectedFields, rubricItems }),
+      body: JSON.stringify({
+        title, description, gradeLevel, subjectFilter, fieldsConfig: selectedFields, rubricItems,
+        presetAchievementStandards: selectedStandards.length > 0 ? selectedStandards : undefined,
+      }),
     })
 
     if (res.ok) {
@@ -126,7 +139,7 @@ export default function NewAssignment() {
               <label className="block text-sm font-medium text-gray-700 mb-1">과목</label>
               <select
                 value={subjectFilter}
-                onChange={(e) => setSubjectFilter(e.target.value)}
+                onChange={(e) => { setSubjectFilter(e.target.value); setSelectedStandards([]) }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-400"
               >
                 <option value="">전체</option>
@@ -134,6 +147,31 @@ export default function NewAssignment() {
               </select>
             </div>
           </div>
+
+          {subjectFilter && availableStandards.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                성취기준 선택{' '}
+                <span className="text-gray-400 font-normal text-xs">(선택 - 학생에게 미리 제공됩니다)</span>
+              </label>
+              <div className="space-y-1 max-h-52 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
+                {availableStandards.map((s, i) => (
+                  <label key={i} className="flex items-start gap-2 cursor-pointer p-1.5 rounded hover:bg-white">
+                    <input
+                      type="checkbox"
+                      checked={selectedStandards.includes(s)}
+                      onChange={() => toggleStandard(s)}
+                      className="mt-0.5 accent-indigo-600 flex-shrink-0"
+                    />
+                    <span className="text-xs text-gray-700 leading-snug">{s}</span>
+                  </label>
+                ))}
+              </div>
+              {selectedStandards.length > 0 && (
+                <p className="text-xs text-indigo-600 mt-1">{selectedStandards.length}개 선택됨</p>
+              )}
+            </div>
+          )}
         </section>
 
         {/* 기획서 항목 선택 */}

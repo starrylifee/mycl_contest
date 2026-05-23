@@ -25,7 +25,14 @@ export default function PlanPage({ params }: { params: Promise<{ token: string }
         if (!r.ok) { setNotFound(true); return null }
         return r.json()
       })
-      .then((data) => { if (data) setAssignment(data) })
+      .then((data) => {
+        if (data) {
+          setAssignment(data)
+          if (data.presetAchievementStandards?.length > 0) {
+            setFormData((prev) => ({ ...prev, achievementStandards: data.presetAchievementStandards }))
+          }
+        }
+      })
   }, [token])
 
   const updateField = (key: FieldKey, value: string | string[]) => {
@@ -161,11 +168,22 @@ export default function PlanPage({ params }: { params: Promise<{ token: string }
               </div>
 
               {field === 'achievementStandards' ? (
-                <AchievementPicker
-                  initialGradeGroup={assignment.gradeLevel}
-                  value={(formData.achievementStandards as string[]) ?? []}
-                  onChange={(v) => updateField('achievementStandards', v)}
-                />
+                assignment.presetAchievementStandards && assignment.presetAchievementStandards.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {assignment.presetAchievementStandards.map((s, i) => (
+                      <div key={i} className="flex items-start gap-2 bg-indigo-50 rounded-lg px-3 py-2">
+                        <span className="text-indigo-500 flex-shrink-0 text-sm">✓</span>
+                        <span className="text-xs text-gray-700 leading-snug">{s}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <AchievementPicker
+                    initialGradeGroup={assignment.gradeLevel}
+                    value={(formData.achievementStandards as string[]) ?? []}
+                    onChange={(v) => updateField('achievementStandards', v)}
+                  />
+                )
               ) : (
                 <textarea
                   value={(formData[field] as string) ?? ''}

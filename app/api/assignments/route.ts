@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
     rubricItems: body.rubricItems ?? [],
     gradeLevel: body.gradeLevel,
     subjectFilter: body.subjectFilter ?? '',
+    ...(body.presetAchievementStandards?.length > 0 && { presetAchievementStandards: body.presetAchievementStandards }),
     createdAt: new Date() as unknown as import('firebase/firestore').Timestamp,
   }
 
