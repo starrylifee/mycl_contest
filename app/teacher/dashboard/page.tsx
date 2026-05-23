@@ -86,6 +86,15 @@ export default function TeacherDashboard() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
+        {/* 소개 배너 */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl px-6 py-4 mb-6 flex items-center gap-4">
+          <div className="text-3xl flex-shrink-0">💡</div>
+          <div>
+            <p className="font-semibold text-gray-800 text-sm">학생이 배운 내용으로 학습 게임을 기획하면, AI가 앱으로 만들어드립니다.</p>
+            <p className="text-xs text-gray-500 mt-0.5">학생은 지식을 소비하는 학습자에서 → 게임을 설계하는 제작자로 전환됩니다.</p>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
             <button
