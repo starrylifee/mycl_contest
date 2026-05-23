@@ -55,17 +55,42 @@ export default function TeacherDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <div className="text-5xl">👩‍🏫</div>
-        <h1 className="text-2xl font-bold text-gray-800">교사 로그인</h1>
-        <p className="text-gray-500">Google 계정으로 로그인하세요</p>
-        <button
-          onClick={signInWithGoogle}
-          className="flex items-center gap-3 px-6 py-3 bg-white border border-gray-300 rounded-xl shadow hover:shadow-md transition-shadow font-medium"
-        >
-          <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
-          Google로 로그인
-        </button>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col items-center justify-center px-4">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="text-5xl">🎓</div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">에듀앱 빌더</h1>
+            <p className="text-indigo-600 font-medium mt-1">AI 학습 게임 제작 플랫폼</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="bg-white rounded-2xl border p-4 shadow-sm">
+              <div className="text-2xl mb-1">📝</div>
+              <p className="text-xs font-medium text-gray-700">학생이 기획서 작성</p>
+            </div>
+            <div className="bg-white rounded-2xl border p-4 shadow-sm">
+              <div className="text-2xl mb-1">🤖</div>
+              <p className="text-xs font-medium text-gray-700">AI가 앱 자동 생성</p>
+            </div>
+            <div className="bg-white rounded-2xl border p-4 shadow-sm">
+              <div className="text-2xl mb-1">🎮</div>
+              <p className="text-xs font-medium text-gray-700">친구들과 체험·평가</p>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 leading-relaxed">
+            학생이 배운 내용으로 학습 게임을 기획하면<br />AI가 웹앱으로 만들어드립니다.
+          </p>
+
+          <button
+            onClick={signInWithGoogle}
+            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white border border-gray-300 rounded-xl shadow hover:shadow-md transition-shadow font-medium text-gray-700"
+          >
+            <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+            교사 Google 계정으로 로그인
+          </button>
+          <p className="text-xs text-gray-400">교사 계정으로만 로그인 가능합니다</p>
+        </div>
       </div>
     )
   }
